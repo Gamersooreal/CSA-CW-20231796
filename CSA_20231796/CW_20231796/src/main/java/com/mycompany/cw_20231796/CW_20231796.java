@@ -11,6 +11,6 @@ package com.mycompany.cw_20231796;
 public class CW_20231796 {
 
     public static void main(String[] args) {
-        System.out.println("");
+        System.out.println("Hi");
     }
 }
