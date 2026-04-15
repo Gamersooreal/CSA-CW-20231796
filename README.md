@@ -130,7 +130,7 @@ curl http://localhost:8080/CW_20231796-1.0/api/v1
 ### 2. Create a room
 
 ```powershell
-curl -X POST http://localhost:8080/CW_20231796-1.0/api/v1/rooms `
+curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/rooms `
   -H "Content-Type: application/json" `
   -d "{\"id\":\"LIB-301\",\"name\":\"Library Quiet Study\",\"capacity\":30}"
 ```
@@ -144,7 +144,7 @@ curl http://localhost:8080/CW_20231796-1.0/api/v1/rooms
 ### 4. Create a sensor
 
 ```powershell
-curl -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors `
+curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors `
   -H "Content-Type: application/json" `
   -d "{\"id\":\"TEMP-001\",\"type\":\"Temperature\",\"status\":\"ACTIVE\",\"currentValue\":0.0,\"roomId\":\"LIB-301\"}"
 ```
@@ -158,7 +158,7 @@ curl "http://localhost:8080/CW_20231796-1.0/api/v1/sensors?type=Temperature"
 ### 6. Add a reading
 
 ```powershell
-curl -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors/TEMP-001/readings `
+curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors/TEMP-001/readings `
   -H "Content-Type: application/json" `
   -d "{\"id\":\"R1\",\"timestamp\":1713200000,\"value\":22.5}"
 ```
@@ -172,7 +172,15 @@ curl http://localhost:8080/CW_20231796-1.0/api/v1/sensors/TEMP-001/readings
 ### 8. Try deleting a room with sensors
 
 ```powershell
-curl -X DELETE http://localhost:8080/CW_20231796-1.0/api/v1/rooms/LIB-301
+curl -i -X DELETE http://localhost:8080/CW_20231796-1.0/api/v1/rooms/LIB-301
+```
+
+### 9. Try creating a sensor with an invalid room
+
+```powershell
+curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors `
+  -H "Content-Type: application/json" `
+  -d "{\"id\":\"BAD-001\",\"type\":\"CO2\",\"status\":\"ACTIVE\",\"currentValue\":0.0,\"roomId\":\"NO_ROOM\"}"
 ```
 
 ## Report Answers
@@ -181,7 +189,7 @@ curl -X DELETE http://localhost:8080/CW_20231796-1.0/api/v1/rooms/LIB-301
 
 #### 1. Project and Application Configuration
 
-By using a JAX-RS `Application` subclass with `@ApplicationPath("/api/v1")`, the API gets a clear versioned entry point and a clean structure for all resource classes. In this project, shared data is stored in in-memory collections rather than inside resource instances. This is important because API requests may be handled repeatedly and shared data must remain consistent across them. For that reason, the design keeps rooms, sensors, and readings in shared data structures rather than relying on per-request object state.
+The API uses a JAX-RS `Application` subclass with `@ApplicationPath("/api/v1")` so that all resources are grouped under a clear versioned entry point. In this design, the resource classes are treated as request-handling classes rather than places to keep shared application state. Shared data is stored in in-memory collections outside the resource classes, because multiple requests may access the same rooms, sensors, and readings. To avoid data corruption or race conditions, the shared state is kept in central collections and the resource classes only perform operations on that shared data.
 
 #### 2. Discovery Endpoint
 
@@ -201,7 +209,7 @@ The `DELETE` operation is idempotent because repeating the same delete request d
 
 #### 1. Sensor Resource and Integrity
 
-The `@Consumes(MediaType.APPLICATION_JSON)` annotation tells JAX-RS that the endpoint expects JSON input. If a client sends a different content type such as `text/plain` or `application/xml`, the framework will reject the request before normal processing. This protects the API from invalid input formats and keeps request handling predictable.
+The `@Consumes(MediaType.APPLICATION_JSON)` annotation tells JAX-RS that the endpoint expects JSON input. If a client sends a different content type such as `text/plain` or `application/xml`, JAX-RS rejects the request before normal processing and typically returns `415 Unsupported Media Type`. This protects the API from invalid input formats and keeps request handling predictable.
 
 #### 2. Filtered Retrieval and Search
 
@@ -215,7 +223,7 @@ The sub-resource locator pattern helps separate nested functionality into focuse
 
 #### 2. Historical Data Management
 
-The reading history endpoint allows each sensor to keep its own collection of readings. When a new reading is posted, the system not only stores the reading in the history list but also updates the parent sensor’s `currentValue`. This keeps the current sensor state consistent with its latest recorded measurement and avoids mismatches between historical and current data.
+The reading history endpoint allows each sensor to keep its own collection of readings. When a new reading is posted, the system not only stores the reading in the history list but also updates the parent sensor's `currentValue`. This keeps the current sensor state consistent with its latest recorded measurement and avoids mismatches between historical and current data.
 
 ### Part 5
 
@@ -229,7 +237,7 @@ When a client tries to create a sensor with a `roomId` that does not exist, the 
 
 #### 3. State Constraint (403)
 
-A sensor in `MAINTENANCE` state cannot accept new readings because its current operational state forbids that action. Returning `403 Forbidden` makes sense because the server understands the request but refuses to perform it due to the sensor’s status. This reflects the business rule clearly to the client.
+A sensor in `MAINTENANCE` state cannot accept new readings because its current operational state forbids that action. Returning `403 Forbidden` makes sense because the server understands the request but refuses to perform it due to the sensor's status. This reflects the business rule clearly to the client.
 
 #### 4. Global Safety Net (500)
 
