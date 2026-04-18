@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MockDatabase {
-    public static final List<Room> ROOMS = new ArrayList<>();
-    public static final List<Sensor> SENSORS = new ArrayList<>();
-    public static final Map<String, List<SensorReading>> READINGS = new HashMap<>();
+    public static final List<Room> ROOMS = new ArrayList<>();// room list
+    public static final List<Sensor> SENSORS = new ArrayList<>();// sensor list
+    public static final Map<String, List<SensorReading>> READINGS = new HashMap<>();// reading list
 }
