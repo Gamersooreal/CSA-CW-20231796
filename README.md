@@ -38,6 +38,8 @@ Main endpoints:
 - `GET /api/v1/sensors?type=CO2`
 - `GET /api/v1/sensors/{sensorId}/readings`
 - `POST /api/v1/sensors/{sensorId}/readings`
+- `GET /api/v1/sensors/{sensorId}`
+- `DELETE /api/v1/sensors/{sensorId}`
 
 Design choices:
 
@@ -123,66 +125,30 @@ Ctrl + C
 
 ### 1. Discovery endpoint
 
-```powershell
 curl http://localhost:8080/CW_20231796-1.0/api/v1
-```
 
-### 2. Create a room
+### 2. Create a Room
 
-```powershell
 curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/rooms `
   -H "Content-Type: application/json" `
   -d "{\"id\":\"LIB-301\",\"name\":\"Library Quiet Study\",\"capacity\":30}"
-```
 
-### 3. Get all rooms
+### 3. Create a Sensor (with Room Validation)
 
-```powershell
-curl http://localhost:8080/CW_20231796-1.0/api/v1/rooms
-```
-
-### 4. Create a sensor
-
-```powershell
 curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors `
   -H "Content-Type: application/json" `
   -d "{\"id\":\"TEMP-001\",\"type\":\"Temperature\",\"status\":\"ACTIVE\",\"currentValue\":0.0,\"roomId\":\"LIB-301\"}"
-```
 
-### 5. Filter sensors by type
+### 4. Add a Sensor Reading
 
-```powershell
-curl "http://localhost:8080/CW_20231796-1.0/api/v1/sensors?type=Temperature"
-```
-
-### 6. Add a reading
-
-```powershell
 curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors/TEMP-001/readings `
   -H "Content-Type: application/json" `
   -d "{\"id\":\"R1\",\"timestamp\":1713200000,\"value\":22.5}"
-```
 
-### 7. Get reading history
+### 5. Get Reading History
 
-```powershell
 curl http://localhost:8080/CW_20231796-1.0/api/v1/sensors/TEMP-001/readings
-```
-
-### 8. Try deleting a room with sensors
-
-```powershell
-curl -i -X DELETE http://localhost:8080/CW_20231796-1.0/api/v1/rooms/LIB-301
-```
-
-### 9. Try creating a sensor with an invalid room
-
-```powershell
-curl -i -X POST http://localhost:8080/CW_20231796-1.0/api/v1/sensors `
-  -H "Content-Type: application/json" `
-  -d "{\"id\":\"BAD-001\",\"type\":\"CO2\",\"status\":\"ACTIVE\",\"currentValue\":0.0,\"roomId\":\"NO_ROOM\"}"
-```
-
+  
 ## Report Answers
 
 ### Part 1

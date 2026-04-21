@@ -11,18 +11,18 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-    private static final Logger LOGGER = Logger.getLogger(LoggingFilter.class.getName());
+    private static final Logger MyLogger = Logger.getLogger(LoggingFilter.class.getName());
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        LOGGER.info("--- Incoming Request ---");
-        LOGGER.info("Method: " + requestContext.getMethod());
-        LOGGER.info("URI: " + requestContext.getUriInfo().getAbsolutePath().toString());
+        MyLogger.info("=== Incoming Request ===");
+        MyLogger.info("Method: " + requestContext.getMethod());
+        MyLogger.info("URI: " + requestContext.getUriInfo().getAbsolutePath().toString());
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        LOGGER.info("--- Outgoing Response ---");
-        LOGGER.info("Status: " + responseContext.getStatus());
+        MyLogger.info("=== Outgoing Response ===");
+        MyLogger.info("Status: " + responseContext.getStatus());
     }
 }

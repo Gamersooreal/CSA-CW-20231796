@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/")
 public class DiscoveryResource {
+    //returns JSON metadata about the API with version, contact info, and available resources
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

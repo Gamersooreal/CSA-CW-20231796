@@ -63,11 +63,12 @@ public class RoomResource {
             }
         }
 
-        if (matchedRoom == null) {
-            throw new DataNotFoundException("Room with ID " + roomId + " not found.");
+        // If room found (and no sensors), delete it
+        if (matchedRoom != null) {
+            MockDatabase.ROOMS.removeIf(room -> room.getId().equals(roomId));
         }
 
-        MockDatabase.ROOMS.removeIf(room -> room.getId().equals(roomId));
+        // Return 204 whether room exists or not (idempotent delete)
         return Response.noContent().build();
     }
 }

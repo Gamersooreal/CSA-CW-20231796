@@ -1,5 +1,7 @@
 package com.mycompany.cw_20231796.resource;
 
+import javax.ws.rs.PathParam;
+import com.mycompany.cw_20231796.exception.DataNotFoundException;
 import com.mycompany.cw_20231796.dao.MockDatabase;
 import com.mycompany.cw_20231796.exception.LinkedResourceNotFoundException;
 import com.mycompany.cw_20231796.model.Room;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,6 +23,18 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/sensors")
 public class SensorResource {
+
+    @GET
+    @Path("/{sensorId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Sensor getSensorById(@PathParam("sensorId") String sensorId) {
+        for (Sensor sensor : MockDatabase.SENSORS) {
+            if (sensor.getId().equals(sensorId)) {
+                return sensor;
+            }
+        }
+        throw new DataNotFoundException("Sensor with ID " + sensorId + " not found.");
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -58,6 +73,35 @@ public class SensorResource {
         matchedRoom.getSensorIds().add(sensor.getId());
         URI location = uriInfo.getAbsolutePathBuilder().path(sensor.getId()).build();
         return Response.created(location).entity(sensor).build();
+    }
+
+    @DELETE
+    @Path("/{sensorId}")
+    public Response deleteSensor(@PathParam("sensorId") String sensorId) {
+        Sensor matchedSensor = null;
+
+        for (Sensor sensor : MockDatabase.SENSORS) {
+            if (sensor.getId().equals(sensorId)) {
+                matchedSensor = sensor;
+                break;
+            }
+        }
+
+        // if sensor found, delete it and remove from room's sensor list
+        if (matchedSensor != null) {
+            MockDatabase.SENSORS.removeIf(sensor -> sensor.getId().equals(sensorId));
+
+            // remove sensor ID from the parent room
+            for (Room room : MockDatabase.ROOMS) {
+                if (room.getId().equals(matchedSensor.getRoomId())) {
+                    room.getSensorIds().removeIf(id -> id.equals(sensorId));
+                    break;
+                }
+            }
+        }
+
+        // return 204 whether sensor exists or not (idempotent delete)
+        return Response.noContent().build();
     }
 
     @Path("/{sensorId}/readings")

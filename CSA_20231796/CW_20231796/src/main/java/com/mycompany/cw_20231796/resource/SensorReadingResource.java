@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+@Path("{sensorId}/readings")
 public class SensorReadingResource {
 
     @GET
@@ -45,7 +47,8 @@ public class SensorReadingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addReading(@PathParam("sensorId") String sensorId, SensorReading reading, @Context UriInfo uriInfo) {
+    public Response addReading(@PathParam("sensorId") String sensorId, SensorReading reading,
+            @Context UriInfo uriInfo) {
         Sensor matchedSensor = null;
 
         for (Sensor sensor : MockDatabase.SENSORS) {
@@ -59,8 +62,8 @@ public class SensorReadingResource {
             throw new DataNotFoundException("Sensor with ID " + sensorId + " not found.");
         }
 
-        if ("MAINTENANCE".equalsIgnoreCase(matchedSensor.getStatus())) {
-            throw new SensorUnavailableException("Sensor " + sensorId + " is in maintenance mode.");
+        if (!"ACTIVE".equalsIgnoreCase(matchedSensor.getStatus())) {
+            throw new SensorUnavailableException("Sensor " + sensorId + " is not active.");
         }
 
         MockDatabase.READINGS.computeIfAbsent(sensorId, key -> new ArrayList<>()).add(reading);
