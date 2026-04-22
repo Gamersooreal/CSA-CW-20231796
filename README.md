@@ -66,53 +66,75 @@ CW/
         resource/
 ```
 
-## Build And Run
+## Recommended Method (Using NetBeans + Tomcat Integration)
 
-Project path:
+1. One-Time Setup
+2. Open NetBeans.
+3. Go to Services → Servers.
+4. Add Apache Tomcat Server.
 
-```text
-D:\lehan\IIT\CSA\CW\CSA_20231796\CW_20231796
+### Select your Tomcat installation directory:
+
+```
+D:\apache-tomcat-9.0.100\apache-tomcat-9.0.100
 ```
 
-### Build In NetBeans
+5. Enter your Tomcat username and password
+(configured in conf/tomcat-users.xml)
 
-Because Maven was not available directly in the terminal, the project was built using NetBeans:
+### Configure Project
+1. Right-click the project → Properties
+2. Go to Run
+3. Set:
+Server: Apache Tomcat
+Context Path: /CW_20231796-1.0
 
+### Run the Application
+Click Run (F6)
+
+NetBeans will:
+- Build the project
+- Deploy it to Tomcat
+- Start the server
+- Open the application in your browser
+
+
+## Alternative Method (Manual WAR Deployment)
+
+Use this method if NetBeans integration is not available.
+
+### Build in NetBeans
 1. Open the project in NetBeans.
 2. Right-click the project.
-3. Select `Clean and Build`.
-4. This generates the WAR file inside the `target` folder.
+3. Select Clean and Build.
+4. This generates the .war file in:
+```
+D:\CSA_20231796\CW_20231796\target
+```
+### Deploy to Tomcat
 
-Expected WAR location:
-
-```text
-D:\lehan\IIT\CSA\CW\CSA_20231796\CW_20231796\target
+Tomcat path:
+```
+D:\apache-tomcat-9.0.100\apache-tomcat-9.0.100
 ```
 
-### Deploy To Tomcat
+### Steps:
 
-Tomcat path used:
+1. Copy the generated .war file into:
 
-```text
-D:\lehan\IIT\CSA\apache-tomcat-9.0.100\apache-tomcat-9.0.100
+```
+apache-tomcat-9.0.100\webapps
 ```
 
-Deployment steps:
-
-1. Copy the generated WAR file into Tomcat's `webapps` folder.
 2. Open PowerShell.
-3. Run:
 
-```powershell
-cd D:\lehan\IIT\CSA\apache-tomcat-9.0.100\apache-tomcat-9.0.100\bin
-$env:JAVA_HOME="C:\Program Files\Java\jdk-21"
-.\catalina.bat run
+3. Navigate to:
 ```
-
-Once Tomcat starts successfully, the application is accessible at:
-
-```text
-http://localhost:8080/CW_20231796-1.0/api/v1
+apache-tomcat-9.0.100\bin
+```
+4. Run:
+```
+startup.bat
 ```
 
 To stop Tomcat:
@@ -120,6 +142,7 @@ To stop Tomcat:
 ```powershell
 Ctrl + C
 ```
+
 
 ## Sample curl Commands
 
