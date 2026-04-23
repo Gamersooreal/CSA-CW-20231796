@@ -56,6 +56,12 @@ public class SensorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSensor(Sensor sensor, @Context UriInfo uriInfo) {
+
+        // forced 500 error
+        if ("boom".equals(sensor.getId())) {
+            throw new RuntimeException("Simulated server failure");
+        }
+
         Room matchedRoom = null;
 
         for (Room room : MockDatabase.ROOMS) {

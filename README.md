@@ -143,6 +143,18 @@ To stop Tomcat:
 Ctrl + C
 ```
 
+## Make sure that the .war file in the apache webapp folder is up to date with the project .war
+
+### Apache webapp folder location
+```
+ \apache-tomcat-9.0.100\apache-tomcat-9.0.100\webapps
+```
+
+### Project webapp folder location
+```
+ \CSA_20231796\CW_20231796\target
+```
+
 
 ## Sample curl Commands
 
